@@ -16,7 +16,6 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  background-attachment: scroll;
 }
 
 @media (max-width: 768px) {
@@ -36,7 +35,7 @@ header {
 
 h1 {
   margin: 0;
-  font-size: 2em;
+  font-size: 1.8em;
   text-shadow: 0 0 10px rgba(0,255,245,0.5);
 }
 
@@ -54,7 +53,7 @@ main {
   border-radius: 12px;
   flex: 1 1 calc(33.33% - 20px);
   min-width: 250px;
-  max-width: 400px;
+  max-width: 350px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -69,9 +68,15 @@ main {
   transition: transform 0.3s ease;
 }
 
-.card-body h3,
-.card-body p {
-  transition: transform 0.3s ease, color 0.3s ease;
+.card-body {
+  padding: 15px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
 }
 
 .card:hover {
@@ -80,15 +85,6 @@ main {
 
 .card:hover img {
   transform: scale(1.1);
-}
-
-.card:hover .card-body h3 {
-  transform: scale(1.05);
-  color: #00fff5;
-}
-
-.card:hover .card-body p {
-  transform: scale(1.02);
 }
 
 .price {
@@ -110,17 +106,12 @@ button:hover {
   opacity: 0.9;
 }
 
-/* Footer style */
 footer {
   background: rgba(0,0,0,0.8);
   color: #fff;
   text-align: center;
   padding: 25px 15px;
   margin-top: 30px;
-}
-
-footer h2 {
-  margin-bottom: 10px;
 }
 
 footer a {
@@ -150,15 +141,12 @@ footer hr {
 <body>
 
 <header>
-  <h1>✨ "Pesona Rasa — Karya Lezat Daruma untuk Setiap Momen"</h1>
+  <h1>✨ Pesona Rasa — Karya Lezat Daruma</h1>
   <p>📜 Hadirkan cita rasa terbaik dari bahan pilihan, diracik dengan sepenuh hati oleh Daruma. Nikmati kelezatan yang memikat lidah dan meninggalkan kesan tak terlupakan.</p>
 </header>
 
-<main id="menu">
-  <!-- Produk akan dimuat di sini -->
-</main>
+<main id="menu"></main>
 
-<!-- Footer Section -->
 <footer>
   <h2>Ingin Pesan Lebih Banyak atau Jadi Agen Kami?</h2>
   <p>Hubungi kami sekarang untuk penawaran spesial dan peluang kemitraan.</p>
@@ -168,57 +156,59 @@ footer hr {
 </footer>
 
 <script>
-  const products = [
-    {id: 'p1', name: 'Otak-Otak Ikan', price: 12000, image: 'Gambar/Gambar WhatsApp 2025-08-10 pukul 21.11.08_48b4316e.jpg', desc: 'Otak Otak Dibuat Dengan Daging Ikan & Sayuran Tampa Bahan Pengawet Yang Pastinya Lezat, Yang Dapat Dinikmati Untuk Nyemil Dan Teman Makan.'},
-    {id: 'p2', name: 'Kaki Naga', price: 12000, image: 'Gambar/Gambar WhatsApp 2025-08-10 pukul 21.11.08_92aad66c.jpg', desc: 'Kaki naga dibuat dari campuran daging ikan segar dan udang pilihan, dibalut tepung renyah dan diolah tanpa bahan pengawet. Rasanya gurih, teksturnya lembut di dalam, renyah di luar. Cocok sebagai camilan, lauk, atau sajian spesial keluarga. Sekali gigit, pasti bikin nagih!'},
-    {id: 'p3', name: 'Bakso Ikan', price: 12000, image: 'Gambar/Gambar WhatsApp 2025-08-10 pukul 21.11.16_840daa42.jpg', desc: 'Bakso ikan dibuat dari daging ikan segar pilihan, diolah dengan bumbu istimewa tanpa bahan pengawet. Teksturnya lembut, rasa ikannya gurih alami, dan sehat untuk seluruh keluarga. Cocok disantap hangat dengan kuah segar atau digoreng untuk camilan lezat!'},
-    {id: 'p4', name: 'Nuget Ikan', price: 12000, image: 'Gambar/Gambar WhatsApp 2025-08-10 pukul 21.11.10_3842660e.jpg', desc: 'Bakso ikan dibuat dari daging ikan segar pilihan, diolah dengan bumbu istimewa tanpa bahan pengawet. Teksturnya lembut, rasa ikannya gurih alami, dan sehat untuk seluruh keluarga. Cocok disantap hangat dengan kuah segar atau digoreng untuk camilan lezat!'},
-  ];
+const products = [
+  {id: 'p1', name: 'Otak-Otak Ikan', price: 12000, image: 'Gambar/otakotak.jpg', desc: 'Otak Otak dibuat dari daging ikan segar & sayuran tanpa bahan pengawet. Lezat, sehat, cocok untuk nyemil atau teman makan.'},
+  {id: 'p2', name: 'Kaki Naga', price: 12000, image: 'Gambar/kakinaga.jpg', desc: 'Kaki naga dari campuran daging ikan segar dan udang pilihan, dibalut tepung renyah tanpa bahan pengawet. Gurih, lembut di dalam, renyah di luar.'},
+  {id: 'p3', name: 'Bakso Ikan', price: 12000, image: 'Gambar/baksoikan.jpg', desc: 'Bakso ikan dari daging ikan segar, bumbu istimewa tanpa pengawet. Tekstur lembut, rasa gurih alami, sehat untuk keluarga.'},
+  {id: 'p4', name: 'Nuget Ikan', price: 12000, image: 'Gambar/nuggetikan.jpg', desc: 'Nuget ikan dari fillet ikan segar, dibumbui dan dibalut tepung renyah. Tanpa bahan pengawet, nikmat untuk bekal atau camilan.'}
+];
 
-  const menu = document.getElementById('menu');
-  products.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = 
-      <img src="${p.image}" alt="${p.name}">
-      <div class="card-body">
-        <h3>${p.name}</h3>
-        <p>${p.desc}</p>
-      </div>
-      <div class="card-footer">
-        <span class="price">Rp ${p.price.toLocaleString()}</span>
-        <button onclick="checkout('${https://n8n-u4h4ccvawbyc.ciluba.sumopod.my.id/webhook/topup-balance}')">Beli</button>
-      </div>
-    ;
-    menu.appendChild(card);
-  });
+const menu = document.getElementById('menu');
+products.forEach(p => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <img src="${p.image}" alt="${p.name}">
+    <div class="card-body">
+      <h3>${p.name}</h3>
+      <p>${p.desc}</p>
+    </div>
+    <div class="card-footer">
+      <span class="price">Rp ${p.price.toLocaleString()}</span>
+      <button onclick="checkout('${p.id}')">Beli</button>
+    </div>
+  `;
+  menu.appendChild(card);
+});
 
-  async function checkout(productId) {
-    const product = products.find(p => p.id === productId);
-    const body = {
-      items: [{id: product.id, name: product.name, price: product.price, qty: 1}],
-      shop_name: 'Pesona Rasa'
-    };
-    try {
-      const res = await fetch('/api/create-invoice', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (data.invoice_url) {
-        window.location.href = data.invoice_url;
-      } else {
-        alert('Gagal membuat invoice.');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Terjadi kesalahan.');
+async function checkout(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return alert('Produk tidak ditemukan.');
+
+  const body = {
+    items: [{id: product.id, name: product.name, price: product.price, qty: 1}],
+    shop_name: 'Pesona Rasa'
+  };
+
+  try {
+    const res = await fetch('https://n8n-u4h4ccvawbyc.ciluba.sumopod.my.id/webhook/topup-balance', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.invoice_url) {
+      window.location.href = data.invoice_url;
+    } else {
+      alert('Gagal membuat invoice.');
     }
+  } catch (err) {
+    console.error(err);
+    alert('Terjadi kesalahan saat memproses pesanan.');
   }
+}
 
-  // Set tahun otomatis
-  document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 </body>
