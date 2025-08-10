@@ -12,13 +12,12 @@ body {
   background:
     linear-gradient(rgba(11, 15, 22, 0.85), rgba(11, 15, 22, 0.85)),
     url('https://indofishmart.id/wp-content/uploads/2024/12/DALL%C2%B7E-2024-12-03-10.41.48-A-visually-appealing-illustration-showcasing-an-array-of-frozen-food-products-such-as-packaged-dumplings-spring-rolls-frozen-seafood-and-vegetables.webp');
-  background-size: cover;        /* Sesuaikan ukuran layar */
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  background-attachment: scroll; /* Ikut scroll */
+  background-attachment: scroll;
 }
 
-/* Responsif di ponsel */
 @media (max-width: 768px) {
   body {
     background-size: cover;
@@ -26,29 +25,29 @@ body {
   }
 }
 
-  header {
-    padding: 20px;
-    text-align: center;
-    background: rgba(11, 15, 22, 0.8);
-    backdrop-filter: blur(6px);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
+header {
+  padding: 20px;
+  text-align: center;
+  background: rgba(11, 15, 22, 0.8);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
 
-  h1 {
-    margin: 0;
-    font-size: 2em;
-    text-shadow: 0 0 10px rgba(0,255,245,0.5);
-  }
+h1 {
+  margin: 0;
+  font-size: 2em;
+  text-shadow: 0 0 10px rgba(0,255,245,0.5);
+}
 
-  main {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    padding: 20px;
-  }
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
 
-  .card {
+.card {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
@@ -59,57 +58,92 @@ body {
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(4px);
-  transition: transform 0.3s ease; /* efek animasi card */
+  transition: transform 0.3s ease;
 }
 
 .card img {
   width: 100%;
   height: 150px;
   object-fit: cover;
-  transition: transform 0.3s ease; /* animasi zoom gambar */
+  transition: transform 0.3s ease;
 }
 
 .card-body h3,
 .card-body p {
-  transition: transform 0.3s ease, color 0.3s ease; /* animasi zoom teks */
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 
-/* Efek saat hover */
 .card:hover {
-  transform: scale(1.03); /* sedikit perbesar seluruh card */
+  transform: scale(1.03);
 }
 
 .card:hover img {
-  transform: scale(1.1); /* zoom gambar */
+  transform: scale(1.1);
 }
 
 .card:hover .card-body h3 {
   transform: scale(1.05);
-  color: #00fff5; /* beri efek warna */
+  color: #00fff5;
 }
 
 .card:hover .card-body p {
   transform: scale(1.02);
 }
 
-  .price {
-    color: #00fff5;
-    font-weight: bold;
-  }
+.price {
+  color: #00fff5;
+  font-weight: bold;
+}
 
-  button {
-    background: linear-gradient(90deg, #00fff5, #ff67e0);
-    border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    color: black;
-    font-weight: bold;
-    cursor: pointer;
-  }
+button {
+  background: linear-gradient(90deg, #00fff5, #ff67e0);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-  button:hover {
-    opacity: 0.9;
-  }
+button:hover {
+  opacity: 0.9;
+}
+
+/* Footer style */
+footer {
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  text-align: center;
+  padding: 25px 15px;
+  margin-top: 30px;
+}
+
+footer h2 {
+  margin-bottom: 10px;
+}
+
+footer a {
+  display: inline-block;
+  background: #f39c12;
+  color: #fff;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-top: 10px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+footer a:hover {
+  background: #d48806;
+}
+
+footer hr {
+  margin: 20px auto;
+  width: 80%;
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
 </style>
 </head>
 <body>
@@ -123,19 +157,27 @@ body {
   <!-- Produk akan dimuat di sini -->
 </main>
 
+<!-- Footer Section -->
+<footer>
+  <h2>Ingin Pesan Lebih Banyak atau Jadi Agen Kami?</h2>
+  <p>Hubungi kami sekarang untuk penawaran spesial dan peluang kemitraan.</p>
+  <a href="https://wa.me/6281234567890?text=Halo%2C%20Saya%20ingin%20memesan%20atau%20menjadi%20agen">📲 Hubungi Kami via WhatsApp</a>
+  <hr>
+  <p>&copy; <span id="year"></span> PT. Pesona Golden Steel. All Rights Reserved.</p>
+</footer>
+
 <script>
   const products = [
     {id: 'p1', name: 'Otak-Otak Ikan', price: 12000, image: 'Gambar/Gambar WhatsApp 2025-08-10 pukul 21.11.08_48b4316e.jpg', desc: 'Otak Otak Dibuat Dengan Daging Ikan & Sayuran Tampa Bahan Pengawet Yang Pastinya Lezat, Yang Dapat Dinikmati Untuk Nyemil Dan Teman Makan.'},
     {id: 'p2', name: 'Kaki Naga', price: 12000, image: 'Gambar/Gambar WhatsApp 2025-08-10 pukul 21.11.08_92aad66c.jpg', desc: 'Kaki naga dibuat dari campuran daging ikan segar dan udang pilihan, dibalut tepung renyah dan diolah tanpa bahan pengawet. Rasanya gurih, teksturnya lembut di dalam, renyah di luar. Cocok sebagai camilan, lauk, atau sajian spesial keluarga. Sekali gigit, pasti bikin nagih!'},
     {id: 'p3', name: 'Bakso Ikan', price: 12000, image: 'Gambar/Gambar WhatsApp 2025-08-10 pukul 21.11.16_840daa42.jpg', desc: 'Bakso ikan dibuat dari daging ikan segar pilihan, diolah dengan bumbu istimewa tanpa bahan pengawet. Teksturnya lembut, rasa ikannya gurih alami, dan sehat untuk seluruh keluarga. Cocok disantap hangat dengan kuah segar atau digoreng untuk camilan lezat!'}
-    
-];
+  ];
 
   const menu = document.getElementById('menu');
   products.forEach(p => {
     const card = document.createElement('div');
     card.className = 'card';
-    card.innerHTML = 
+    card.innerHTML = `
       <img src="${p.image}" alt="${p.name}">
       <div class="card-body">
         <h3>${p.name}</h3>
@@ -145,7 +187,7 @@ body {
         <span class="price">Rp ${p.price.toLocaleString()}</span>
         <button onclick="checkout('${p.id}')">Beli</button>
       </div>
-    ;
+    `;
     menu.appendChild(card);
   });
 
@@ -172,6 +214,9 @@ body {
       alert('Terjadi kesalahan.');
     }
   }
+
+  // Set tahun otomatis
+  document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 </body>
