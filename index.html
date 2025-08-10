@@ -6,135 +6,76 @@
 <link rel="icon" href="Gambar/Screenshot_2025-06-25_221917-removebg-preview.png" type="image/png" />
 <title>Pesona Rasa</title>
 <style>
+/* --- Style Awal --- */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   color: white;
-  background:
-    linear-gradient(rgba(11, 15, 22, 0.85), rgba(11, 15, 22, 0.85)),
-    url('https://n8n-u4h4ccvawbyc.ciluba.sumopod.my.id/webhook/topup-balance');
+  background: linear-gradient(rgba(11, 15, 22, 0.85), rgba(11, 15, 22, 0.85)), url('bg.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
-
 @media (max-width: 768px) {
-  body {
-    background-size: cover;
-    background-position: center top;
-  }
+  body { background-size: cover; background-position: center top; }
 }
+header { padding: 20px; text-align: center; background: rgba(11, 15, 22, 0.8); backdrop-filter: blur(6px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+h1 { margin: 0; font-size: 1.8em; text-shadow: 0 0 10px rgba(0,255,245,0.5); }
+main { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px; }
+.card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; flex: 1 1 calc(33.33% - 20px); min-width: 250px; max-width: 350px; overflow: hidden; display: flex; flex-direction: column; backdrop-filter: blur(4px); transition: transform 0.3s ease; }
+.card img { width: 100%; height: 150px; object-fit: cover; transition: transform 0.3s ease; }
+.card-body { padding: 15px; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; }
+.card:hover { transform: scale(1.03); }
+.card:hover img { transform: scale(1.1); }
+.price { color: #00fff5; font-weight: bold; }
+button { background: linear-gradient(90deg, #00fff5, #ff67e0); border: none; padding: 8px 12px; border-radius: 8px; color: black; font-weight: bold; cursor: pointer; }
+button:hover { opacity: 0.9; }
+footer { background: rgba(0,0,0,0.8); color: #fff; text-align: center; padding: 25px 15px; margin-top: 30px; }
+footer a { display: inline-block; background: #f39c12; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 6px; margin-top: 10px; font-weight: bold; transition: background 0.3s; }
+footer a:hover { background: #d48806; }
+footer hr { margin: 20px auto; width: 80%; border: 0; border-top: 1px solid rgba(255,255,255,0.2); }
 
-header {
+/* --- Modal Popup --- */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 999; 
+  padding-top: 100px; 
+  left: 0; top: 0; 
+  width: 100%; height: 100%; 
+  background-color: rgba(0,0,0,0.6);
+}
+.modal-content {
+  background-color: #1f1f1f;
+  margin: auto;
   padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  color: white;
+}
+.modal-content h2 {
+  margin-top: 0;
   text-align: center;
-  background: rgba(11, 15, 22, 0.8);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-
-h1 {
-  margin: 0;
-  font-size: 1.8em;
-  text-shadow: 0 0 10px rgba(0,255,245,0.5);
-}
-
-main {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  padding: 20px;
-}
-
-.card {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  flex: 1 1 calc(33.33% - 20px);
-  min-width: 250px;
-  max-width: 350px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  backdrop-filter: blur(4px);
-  transition: transform 0.3s ease;
-}
-
-.card img {
+.modal-content input {
   width: 100%;
-  height: 150px;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.card-body {
-  padding: 15px;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-}
-
-.card:hover {
-  transform: scale(1.03);
-}
-
-.card:hover img {
-  transform: scale(1.1);
-}
-
-.price {
-  color: #00fff5;
-  font-weight: bold;
-}
-
-button {
-  background: linear-gradient(90deg, #00fff5, #ff67e0);
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-footer {
-  background: rgba(0,0,0,0.8);
-  color: #fff;
-  text-align: center;
-  padding: 25px 15px;
-  margin-top: 30px;
-}
-
-footer a {
-  display: inline-block;
-  background: #f39c12;
-  color: #fff;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 6px;
+  padding: 10px;
   margin-top: 10px;
-  font-weight: bold;
-  transition: background 0.3s;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
 }
-
-footer a:hover {
-  background: #d48806;
+.modal-content button {
+  width: 100%;
+  margin-top: 15px;
 }
-
-footer hr {
-  margin: 20px auto;
-  width: 80%;
-  border: 0;
-  border-top: 1px solid rgba(255,255,255,0.2);
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -143,6 +84,7 @@ footer hr {
 <header>
   <h1>✨ Pesona Rasa — Karya Lezat Daruma</h1>
   <p>📜 Hadirkan cita rasa terbaik dari bahan pilihan, diracik dengan sepenuh hati oleh Daruma. Nikmati kelezatan yang memikat lidah dan meninggalkan kesan tak terlupakan.</p>
+  <button onclick="openModal()">➕ Add Credit</button>
 </header>
 
 <main id="menu"></main>
@@ -154,6 +96,16 @@ footer hr {
   <hr>
   <p>&copy; <span id="year"></span> PT. Pesona Golden Steel. All Rights Reserved.</p>
 </footer>
+
+<!-- Modal -->
+<div id="topupModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Top Up Saldo</h2>
+    <input type="number" id="topupAmount" placeholder="Masukkan jumlah top up" min="1000">
+    <button onclick="submitTopup()">Kirim</button>
+  </div>
+</div>
 
 <script>
 const products = [
@@ -208,10 +160,45 @@ async function checkout(productId) {
   }
 }
 
+/* === Fitur Modal Top Up === */
+function openModal() {
+  document.getElementById('topupModal').style.display = 'block';
+}
+function closeModal() {
+  document.getElementById('topupModal').style.display = 'none';
+}
+
+async function submitTopup() {
+  const amount = parseInt(document.getElementById('topupAmount').value);
+  if (!amount || amount < 1000) {
+    alert('Masukkan nominal minimal 1000');
+    return;
+  }
+
+  try {
+    const res = await fetch('https://n8n-patuaecdsfbr.pempek.sumopod.my.id/webhook/topup-balance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + 'TOKEN_SUPABASE_ANDA' // Ganti dengan token asli
+      },
+      body: JSON.stringify({ amount })
+    });
+
+    const data = await res.json();
+    if (data.invoice_url) {
+      window.location.href = data.invoice_url;
+    } else {
+      alert('Gagal membuat invoice topup.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Terjadi kesalahan saat memproses topup.');
+  }
+}
+
 document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 </body>
 </html>
-
-
