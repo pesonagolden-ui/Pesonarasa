@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Snowflake } from 'lucide-react';
+import { Menu, X, Snowflake, ShoppingCart } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -8,6 +9,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { totalItems, toggleCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
