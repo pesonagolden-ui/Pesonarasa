@@ -1,41 +1,74 @@
-import React from 'react';
-import { ShoppingCart, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingCart, Star, Check } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const Products = () => {
+  const { addItem } = useCart();
+  const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
+
   const products = [
     {
+      id: 'sosis-premium',
       name: 'Sosis Premium',
       category: 'Meat Products',
-      price: 'Rp 45.000',
+      price: 45000,
+      priceDisplay: 'Rp 45.000',
       rating: 4.9,
       image: 'https://images.pexels.com/photos/4518843/pexels-photo-4518843.jpeg?auto=compress&cs=tinysrgb&w=400',
       description: 'Sosis berkualitas tinggi dengan daging pilihan'
     },
     {
+      id: 'nugget-ayam',
       name: 'Nugget Ayam',
       category: 'Chicken Products',
-      price: 'Rp 35.000',
+      price: 35000,
+      priceDisplay: 'Rp 35.000',
       rating: 4.8,
       image: 'https://images.pexels.com/photos/60616/fried-chicken-chicken-fried-crunchy-60616.jpeg?auto=compress&cs=tinysrgb&w=400',
       description: 'Nugget ayam renyah dengan bumbu rahasia'
     },
     {
+      id: 'dimsum-special',
       name: 'Dimsum Special',
       category: 'Asian Delights',
-      price: 'Rp 55.000',
+      price: 55000,
+      priceDisplay: 'Rp 55.000',
       rating: 4.9,
       image: 'https://images.pexels.com/photos/2664216/pexels-photo-2664216.jpeg?auto=compress&cs=tinysrgb&w=400',
       description: 'Dimsum premium dengan isian daging segar'
     },
     {
+      id: 'fish-fillet',
       name: 'Fish Fillet',
       category: 'Seafood',
-      price: 'Rp 65.000',
+      price: 65000,
+      priceDisplay: 'Rp 65.000',
       rating: 4.7,
       image: 'https://images.pexels.com/photos/725997/pexels-photo-725997.jpeg?auto=compress&cs=tinysrgb&w=400',
       description: 'Fillet ikan segar tanpa duri dan tulang'
     }
   ];
+
+  const handleAddToCart = (product: typeof products[0]) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      description: product.description,
+      category: product.category
+    });
+
+    // Show feedback
+    setAddedItems(prev => new Set(prev).add(product.id));
+    setTimeout(() => {
+      setAddedItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(product.id);
+        return newSet;
+      });
+    }, 2000);
+  };
 
   return (
     <section className="py-20 px-6 relative">
@@ -72,8 +105,19 @@ const Products = () => {
                 </div>
 
                 {/* Add to Cart Button */}
-                <button className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-cyan-500/80 transform hover:scale-110">
-                  <ShoppingCart className="w-5 h-5" />
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className={`absolute top-4 right-4 w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform hover:scale-110 ${
+                    addedItems.has(product.id)
+                      ? 'bg-green-500/80 hover:bg-green-400/80'
+                      : 'bg-white/20 hover:bg-cyan-500/80'
+                  }`}
+                >
+                  {addedItems.has(product.id) ? (
+                    <Check className="w-5 h-5" />
+                  ) : (
+                    <ShoppingCart className="w-5 h-5" />
+                  )}
                 </button>
               </div>
 
@@ -95,10 +139,17 @@ const Products = () => {
 
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-300 bg-clip-text text-transparent">
-                    {product.price}
+                    {product.priceDisplay}
                   </span>
-                  <button className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm rounded-full hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105">
-                    Pesan
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className={`px-4 py-2 text-white text-sm rounded-full transition-all duration-300 transform hover:scale-105 ${
+                      addedItems.has(product.id)
+                        ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500'
+                        : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500'
+                    }`}
+                  >
+                    {addedItems.has(product.id) ? 'Ditambahkan!' : 'Pesan'}
                   </button>
                 </div>
               </div>
