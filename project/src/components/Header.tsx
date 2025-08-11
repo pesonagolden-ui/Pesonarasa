@@ -53,9 +53,23 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <button 
+          {/* Cart and CTA Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            {/* Cart Button */}
+            <button
+              onClick={toggleCart}
+              className="relative p-3 bg-white/10 backdrop-blur-md text-white rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
+            {/* Login Button */}
+            <button
               onClick={onLoginClick}
               className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-cyan-500/25 glow-button"
             >
@@ -85,9 +99,23 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick }) => {
                   {item}
                 </a>
               ))}
-              <button 
+              {/* Mobile Cart Button */}
+              <button
+                onClick={toggleCart}
+                className="relative flex items-center justify-center space-x-2 w-full py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all duration-300"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                <span>Keranjang</span>
+                {totalItems > 0 && (
+                  <span className="w-6 h-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+
+              <button
                 onClick={onLoginClick}
-                className="mt-4 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105"
+                className="mt-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105"
               >
                 Masuk
               </button>
