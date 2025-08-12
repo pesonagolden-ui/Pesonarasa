@@ -56,13 +56,22 @@ firebase deploy
 ## 🛠️ Development Setup
 
 ### Prerequisites
-- Node.js 16+ 
+- Node.js 16+
 - npm or yarn
+- Google Cloud Console account (for Google APIs)
+- QRIS payment provider account
+- Supabase account (optional)
 
 ### Installation
 ```bash
 # Install dependencies
 npm install
+
+# Copy environment configuration
+cp .env.example .env
+
+# Edit .env file with your API keys
+# See configuration section below
 
 # Start development server
 npm run dev
@@ -73,6 +82,33 @@ npm run build
 # Preview production build
 npm run preview
 ```
+
+### 🔧 API Configuration
+
+#### 1. Google APIs Setup
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable the following APIs:
+   - Google Drive API
+   - Google Photos Library API
+   - Google+ API (for authentication)
+4. Create credentials:
+   - API Key (for general API access)
+   - OAuth 2.0 Client ID (for authentication)
+5. Add your domain to authorized origins
+6. Copy the keys to your `.env` file
+
+#### 2. QRIS Payment Setup
+1. Register with a QRIS payment provider (e.g., DANA, OVO, GoPay)
+2. Get your Merchant ID and API Key
+3. Configure webhook URLs for payment notifications
+4. Add credentials to `.env` file
+
+#### 3. Supabase Setup (Optional)
+1. Go to [Supabase](https://supabase.com/)
+2. Create a new project
+3. Get your project URL and anon key from Settings > API
+4. Add to `.env` file
 
 ### Project Structure
 ```
@@ -117,12 +153,43 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 ## 📱 Features
 
+### 🔐 Google Authentication
+- Sign in with Google account
+- Secure OAuth 2.0 implementation
+- User profile management
+- Automatic session handling
+
+### 📷 Image Upload & Management
+- Upload images to Google Drive
+- Automatic image compression and optimization
+- Multiple file upload support
+- Real-time upload progress
+- Image preview and validation
+- Drag & drop interface
+
+### 💳 Interactive QRIS Payment
+- Generate QRIS payment codes
+- Real-time payment status monitoring
+- Automatic payment verification
+- Payment timeout handling
+- Multiple payment method support
+- Transaction history
+
+### 🛒 E-commerce Features
 - Responsive design
 - Shopping cart functionality
 - Product catalog
 - User authentication
 - Checkout process
 - Order confirmation
+
+### 🔧 Technical Features
+- Modern React with Hooks
+- Vite for fast development
+- Environment-based configuration
+- Error handling and validation
+- Mobile-responsive design
+- Clean, modular code structure
 
 ## 🚨 Troubleshooting
 
