@@ -121,9 +121,9 @@
             <h3 style="text-align: center; margin-bottom: 20px;">🔧 System Status</h3>
             <div class="status-grid">
                 <div class="status-item status-success"><strong>✅ Website</strong><br>Fully Operational</div>
-                <div class="status-item status-warning"><strong>⚠️ Google APIs</strong><br>Configure Keys</div>
-                <div class="status-item status-warning"><strong>⚠️ QRIS Payment</strong><br>Configure Merchant</div>
-                <div class="status-item status-info"><strong>ℹ️ Demo Mode</strong><br>All Features Available</div>
+                <div class="status-item status-success"><strong>✅ Google APIs</strong><br>Connected & Ready</div>
+                <div class="status-item status-warning"><strong>⚠️ QRIS Payment</strong><br>Demo Mode</div>
+                <div class="status-item status-info"><strong>ℹ️ Authentication</strong><br>Google OAuth Ready</div>
             </div>
         </div>
 
@@ -219,10 +219,122 @@
     </footer>
 
     <script>
+        // Google API Configuration
+        const GOOGLE_CLIENT_ID = '733822404446-m293n75ai4bo96c1lp1fb26vev3ktd43.apps.googleusercontent.com';
+        const GOOGLE_API_KEY = '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';
+
         let cart = [], total = 0;
-        
-        function showAuth() {
-            alert('🔐 Google Authentication\n\n✅ OAuth 2.0 Ready\n✅ Secure Login\n✅ Profile Management\n\nConfigure Google API keys to enable');
+        let isGoogleLoaded = false;
+        let currentUser = null;
+
+        // Load Google API
+        function loadGoogleAPI() {
+            return new Promise((resolve, reject) => {
+                if (window.gapi) {
+                    resolve();
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://apis.google.com/js/api.js';
+                script.onload = () => {
+                    window.gapi.load('auth2', () => {
+                        window.gapi.auth2.init({
+                            client_id: GOOGLE_CLIENT_ID,
+                            scope: 'profile email'
+                        }).then(() => {
+                            isGoogleLoaded = true;
+                            console.log('✅ Google API loaded successfully');
+                            resolve();
+                        }).catch(reject);
+                    });
+                };
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Google Authentication
+        async function showAuth() {
+            try {
+                if (!isGoogleLoaded) {
+                    const loadingMsg = document.createElement('div');
+                    loadingMsg.innerHTML = '🔄 Loading Google API...';
+                    loadingMsg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:1000;';
+                    document.body.appendChild(loadingMsg);
+
+                    await loadGoogleAPI();
+                    document.body.removeChild(loadingMsg);
+                }
+
+                const authInstance = window.gapi.auth2.getAuthInstance();
+
+                if (currentUser) {
+                    // User is logged in, show logout option
+                    const logout = confirm(`👤 Logged in as: ${currentUser.name}\nEmail: ${currentUser.email}\n\nClick OK to logout`);
+                    if (logout) {
+                        await authInstance.signOut();
+                        currentUser = null;
+                        updateAuthButton();
+                        alert('✅ Successfully logged out!');
+                    }
+                } else {
+                    // User not logged in, show login
+                    const user = await authInstance.signIn();
+                    const profile = user.getBasicProfile();
+
+                    currentUser = {
+                        id: profile.getId(),
+                        name: profile.getName(),
+                        email: profile.getEmail(),
+                        imageUrl: profile.getImageUrl()
+                    };
+
+                    updateAuthButton();
+                    showWelcomeMessage();
+                }
+            } catch (error) {
+                console.error('Google Auth Error:', error);
+                alert('❌ Authentication failed. Please try again.\n\nError: ' + error.message);
+            }
+        }
+
+        // Update auth button
+        function updateAuthButton() {
+            const authBtn = document.querySelector('.btn-auth');
+            if (currentUser) {
+                authBtn.innerHTML = `👤 ${currentUser.name}`;
+                authBtn.style.background = 'rgba(76, 175, 80, 0.2)';
+                authBtn.style.borderColor = 'rgba(76, 175, 80, 0.3)';
+            } else {
+                authBtn.innerHTML = '🔐 Sign in with Google';
+                authBtn.style.background = 'rgba(255,255,255,0.2)';
+                authBtn.style.borderColor = 'rgba(255,255,255,0.3)';
+            }
+        }
+
+        // Show welcome message
+        function showWelcomeMessage() {
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.innerHTML = `
+                <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:1000;text-align:center;max-width:400px;">
+                    <img src="${currentUser.imageUrl}" style="width:80px;height:80px;border-radius:50%;margin-bottom:15px;" alt="Profile">
+                    <h3 style="color:#2196F3;margin-bottom:10px;">Welcome!</h3>
+                    <p><strong>${currentUser.name}</strong></p>
+                    <p style="color:#666;margin-bottom:20px;">${currentUser.email}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background:#4CAF50;color:white;border:none;padding:10px 20px;border-radius:25px;cursor:pointer;font-weight:bold;">
+                        Continue Shopping
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(welcomeDiv);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (welcomeDiv.parentElement) {
+                    welcomeDiv.remove();
+                }
+            }, 5000);
         }
         
         function showImageDemo() {
@@ -230,12 +342,122 @@
             setTimeout(() => alert('✅ Upload Complete!\n\nFiles: 3 images\nSize: 2.1MB → 850KB\nTime: 1.8 seconds'), 1500);
         }
         
-        function showQRISDemo() {
-            const amount = prompt('💳 QRIS Payment\n\nEnter amount (IDR):', '150000');
-            if (amount) {
-                alert(`💰 QRIS Generated!\n\nAmount: Rp ${parseInt(amount).toLocaleString('id-ID')}\nQR Code: Ready\nStatus: Waiting payment`);
-                setTimeout(() => alert('✅ Payment Success!\n\nTransaction completed\nReceipt sent\nOrder confirmed'), 2000);
+        function showQRISDemo(paymentAmount = null, customer = null) {
+            let amount = paymentAmount;
+            let customerInfo = customer || currentUser;
+
+            if (!amount) {
+                amount = prompt('💳 QRIS Payment\n\nEnter amount (IDR):', '150000');
+                if (!amount) return;
             }
+
+            if (!customerInfo) {
+                alert('🔐 Please login first to make a payment');
+                return;
+            }
+
+            // Create QRIS payment modal
+            const qrisDiv = document.createElement('div');
+            qrisDiv.innerHTML = `
+                <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:1000;max-width:400px;width:90%;text-align:center;">
+                    <h3 style="color:#2196F3;margin-bottom:20px;">💳 QRIS Payment</h3>
+
+                    <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px;text-align:left;">
+                        <p><strong>Customer:</strong> ${customerInfo.name}</p>
+                        <p><strong>Email:</strong> ${customerInfo.email}</p>
+                        <p><strong>Amount:</strong> Rp ${parseInt(amount).toLocaleString('id-ID')}</p>
+                        <p><strong>Order ID:</strong> #${Date.now()}</p>
+                    </div>
+
+                    <div style="width:200px;height:200px;margin:20px auto;border:2px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);">
+                        <div>
+                            <div style="font-size:48px;margin-bottom:10px;">📱</div>
+                            <p style="font-size:12px;margin:0;">QRIS Code</p>
+                            <p style="font-size:10px;color:#666;margin:0;">Scan to Pay</p>
+                        </div>
+                    </div>
+
+                    <div id="paymentStatus" style="background:#e3f2fd;padding:10px;border-radius:4px;margin:15px 0;">
+                        <p style="margin:0;font-size:12px;color:#1976d2;">
+                            🔄 Waiting for payment... <span id="countdown">30</span>s
+                        </p>
+                    </div>
+
+                    <div style="margin-top:20px;">
+                        <button onclick="simulatePaymentSuccess()" style="background:#4CAF50;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-right:10px;font-weight:bold;">
+                            ✅ Simulate Success
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#f44336;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(qrisDiv);
+
+            // Start countdown
+            let timeLeft = 30;
+            const countdownElement = qrisDiv.querySelector('#countdown');
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    qrisDiv.querySelector('#paymentStatus').innerHTML = `
+                        <p style="margin:0;font-size:12px;color:#f44336;">
+                            ⏰ Payment timeout. Please try again.
+                        </p>
+                    `;
+                }
+            }, 1000);
+
+            // Auto-simulate payment after 5 seconds (for demo)
+            setTimeout(() => {
+                if (qrisDiv.parentElement && timeLeft > 0) {
+                    simulatePaymentSuccess();
+                }
+            }, 5000);
+        }
+
+        // Simulate payment success
+        function simulatePaymentSuccess() {
+            const qrisModal = document.querySelector('[style*="position:fixed"]');
+            if (qrisModal) {
+                qrisModal.innerHTML = `
+                    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:1000;max-width:400px;width:90%;text-align:center;">
+                        <div style="font-size:60px;color:#4CAF50;margin-bottom:20px;">✅</div>
+                        <h3 style="color:#4CAF50;margin-bottom:15px;">Payment Successful!</h3>
+                        <p>Thank you, <strong>${currentUser ? currentUser.name : 'Customer'}</strong>!</p>
+                        <p style="color:#666;margin-bottom:20px;">Your order has been confirmed.</p>
+
+                        <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px;text-align:left;">
+                            <p><strong>Transaction ID:</strong> TXN${Date.now()}</p>
+                            <p><strong>Amount:</strong> Rp ${total.toLocaleString('id-ID')}</p>
+                            <p><strong>Items:</strong> ${cart.length} items</p>
+                            <p><strong>Status:</strong> <span style="color:#4CAF50;">Paid</span></p>
+                        </div>
+
+                        <button onclick="completeOrder()" style="background:#2196F3;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:bold;width:100%;">
+                            Continue Shopping
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Complete order
+        function completeOrder() {
+            // Clear cart
+            cart = [];
+            total = 0;
+
+            // Close modal
+            const modal = document.querySelector('[style*="position:fixed"]');
+            if (modal) modal.remove();
+
+            // Show success message
+            alert(`🎉 Order Complete!\n\nThank you ${currentUser.name}!\nReceipt sent to ${currentUser.email}\n\nYour frozen foods will be delivered soon!`);
         }
         
         function showGoogleDemo() {
@@ -243,18 +465,152 @@
         }
         
         function addCart(item, price) {
-            cart.push({item, price});
+            if (!currentUser) {
+                const loginFirst = confirm('🔐 Please login first to add items to cart.\n\nClick OK to login with Google');
+                if (loginFirst) {
+                    showAuth();
+                }
+                return;
+            }
+
+            cart.push({
+                item,
+                price,
+                addedBy: currentUser.name,
+                addedAt: new Date().toLocaleString('id-ID')
+            });
             total += price;
-            alert(`🛒 Added to Cart!\n\nItem: ${item}\nPrice: Rp ${price.toLocaleString('id-ID')}\n\nTotal: Rp ${total.toLocaleString('id-ID')}\nItems: ${cart.length}`);
+
+            // Show enhanced cart notification
+            const cartDiv = document.createElement('div');
+            cartDiv.innerHTML = `
+                <div style="position:fixed;top:20px;right:20px;background:white;padding:20px;border-radius:10px;box-shadow:0 5px 20px rgba(0,0,0,0.3);z-index:1000;max-width:300px;border-left:4px solid #4CAF50;">
+                    <h4 style="color:#4CAF50;margin-bottom:10px;">✅ Added to Cart!</h4>
+                    <p><strong>Item:</strong> ${item}</p>
+                    <p><strong>Price:</strong> Rp ${price.toLocaleString('id-ID')}</p>
+                    <p><strong>Customer:</strong> ${currentUser.name}</p>
+                    <hr style="margin:10px 0;">
+                    <p><strong>Cart Total:</strong> Rp ${total.toLocaleString('id-ID')}</p>
+                    <p><strong>Items:</strong> ${cart.length}</p>
+                    <button onclick="showCart()" style="background:#2196F3;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;margin-top:10px;width:100%;">
+                        View Cart
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(cartDiv);
+
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (cartDiv.parentElement) {
+                    cartDiv.remove();
+                }
+            }, 4000);
+        }
+
+        // Show cart details
+        function showCart() {
+            if (cart.length === 0) {
+                alert('🛒 Your cart is empty!\n\nAdd some delicious frozen foods to get started.');
+                return;
+            }
+
+            let cartDetails = '🛒 Shopping Cart\n\n';
+            cart.forEach((item, index) => {
+                cartDetails += `${index + 1}. ${item.item}\n`;
+                cartDetails += `   Price: Rp ${item.price.toLocaleString('id-ID')}\n`;
+                cartDetails += `   Added: ${item.addedAt}\n\n`;
+            });
+            cartDetails += `Total: Rp ${total.toLocaleString('id-ID')}\n`;
+            cartDetails += `Customer: ${currentUser ? currentUser.name : 'Guest'}`;
+
+            const checkout = confirm(cartDetails + '\n\nProceed to checkout?');
+            if (checkout) {
+                showCheckout();
+            }
+        }
+
+        // Show checkout
+        function showCheckout() {
+            if (!currentUser) {
+                alert('🔐 Please login to proceed with checkout');
+                return;
+            }
+
+            const checkoutDiv = document.createElement('div');
+            checkoutDiv.innerHTML = `
+                <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:1000;max-width:500px;width:90%;">
+                    <h3 style="color:#2196F3;margin-bottom:20px;text-align:center;">🛒 Checkout</h3>
+
+                    <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                        <h4>Customer Information:</h4>
+                        <p><strong>Name:</strong> ${currentUser.name}</p>
+                        <p><strong>Email:</strong> ${currentUser.email}</p>
+                    </div>
+
+                    <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                        <h4>Order Summary:</h4>
+                        ${cart.map((item, index) => `
+                            <p>${index + 1}. ${item.item} - Rp ${item.price.toLocaleString('id-ID')}</p>
+                        `).join('')}
+                        <hr style="margin:10px 0;">
+                        <p><strong>Total: Rp ${total.toLocaleString('id-ID')}</strong></p>
+                    </div>
+
+                    <div style="text-align:center;">
+                        <button onclick="processPayment()" style="background:#4CAF50;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:bold;margin-right:10px;">
+                            💳 Pay with QRIS
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#f44336;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:bold;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(checkoutDiv);
+        }
+
+        // Process payment
+        function processPayment() {
+            // Close checkout modal
+            document.querySelector('[style*="position:fixed"]').remove();
+
+            // Show QRIS payment with customer info
+            showQRISDemo(total, currentUser);
         }
         
         function scrollToProducts() {
             document.getElementById('products').scrollIntoView({behavior: 'smooth'});
         }
         
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log('🧊 Frozen Food E-commerce loaded!');
             console.log('✅ All systems operational');
+
+            // Initialize Google API in background
+            try {
+                await loadGoogleAPI();
+                console.log('✅ Google API initialized');
+
+                // Check if user is already signed in
+                const authInstance = window.gapi.auth2.getAuthInstance();
+                if (authInstance.isSignedIn.get()) {
+                    const user = authInstance.currentUser.get();
+                    const profile = user.getBasicProfile();
+
+                    currentUser = {
+                        id: profile.getId(),
+                        name: profile.getName(),
+                        email: profile.getEmail(),
+                        imageUrl: profile.getImageUrl()
+                    };
+
+                    updateAuthButton();
+                    console.log('✅ User already signed in:', currentUser.name);
+                }
+            } catch (error) {
+                console.warn('⚠️ Google API initialization failed:', error.message);
+                console.log('ℹ️ Google features will be available after manual login');
+            }
         });
     </script>
 </body>

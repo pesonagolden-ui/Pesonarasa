@@ -49,13 +49,15 @@ echo 🚀 DEPLOYMENT OPTIONS:
 echo.
 echo 1. Push to GitHub (recommended)
 echo 2. Show deployment guide
-echo 3. Exit
+echo 3. Test Google API locally
+echo 4. Exit
 echo.
-set /p choice="Enter your choice (1-3): "
+set /p choice="Enter your choice (1-4): "
 
 if "%choice%"=="1" goto push_github
 if "%choice%"=="2" goto show_guide
-if "%choice%"=="3" goto end
+if "%choice%"=="3" goto test_google
+if "%choice%"=="4" goto end
 
 :push_github
 echo.
@@ -125,6 +127,32 @@ echo - vite.svg (icon)
 echo - _redirects (routing)
 echo - netlify.toml (config)
 echo.
+
+:test_google
+echo.
+echo 🧪 TESTING GOOGLE API:
+echo.
+echo Opening website for Google API testing...
+start "" "index.html"
+echo.
+echo ✅ WHAT TO TEST:
+echo 1. Click "Sign in with Google" button
+echo 2. Complete Google OAuth login
+echo 3. Verify profile name appears in button
+echo 4. Try adding items to cart (requires login)
+echo 5. Test checkout with Google profile info
+echo.
+echo 🔧 GOOGLE CONSOLE SETUP:
+echo Make sure these domains are added to authorized origins:
+echo - http://localhost
+echo - http://127.0.0.1
+echo - https://your-netlify-domain.netlify.app
+echo.
+echo 📋 API CREDENTIALS:
+echo Client ID: 733822404446-m293n75ai4bo96c1lp1fb26vev3ktd43.apps.googleusercontent.com
+echo API Key: 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
+echo.
+goto end
 
 :end
 echo.
