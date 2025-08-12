@@ -111,8 +111,8 @@ src/
 
 Create a `.env` file for environment-specific settings:
 ```
-VITE_API_URL=your_api_url
-VITE_STRIPE_KEY=your_stripe_key
+VITE_SUPABASE_URL=https://zzpqchngxewnudlkzzew.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6cHFjaG5neGV3bnVkbGt6emV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4NDM3MDIsImV4cCI6MjA3MDQxOTcwMn0.JolXPmk7UHoJ0Zw3gluopQQU0kBlj-3RWwyb3iy-Pnc
 ```
 
 ## 📱 Features
