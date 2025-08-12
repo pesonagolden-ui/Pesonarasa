@@ -241,15 +241,24 @@
                     window.gapi.load('auth2', () => {
                         window.gapi.auth2.init({
                             client_id: GOOGLE_CLIENT_ID,
-                            scope: 'profile email'
+                            scope: 'profile email',
+                            hosted_domain: null,
+                            fetch_basic_profile: true,
+                            ux_mode: 'popup'
                         }).then(() => {
                             isGoogleLoaded = true;
                             console.log('✅ Google API loaded successfully');
                             resolve();
-                        }).catch(reject);
+                        }).catch((error) => {
+                            console.error('Google API init error:', error);
+                            reject(error);
+                        });
                     });
                 };
-                script.onerror = reject;
+                script.onerror = (error) => {
+                    console.error('Failed to load Google API script:', error);
+                    reject(error);
+                };
                 document.head.appendChild(script);
             });
         }
@@ -263,8 +272,30 @@
                     loadingMsg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:1000;';
                     document.body.appendChild(loadingMsg);
 
-                    await loadGoogleAPI();
-                    document.body.removeChild(loadingMsg);
+                    try {
+                        await loadGoogleAPI();
+                        document.body.removeChild(loadingMsg);
+                    } catch (apiError) {
+                        document.body.removeChild(loadingMsg);
+
+                        // Show domain configuration help
+                        const helpMsg = `❌ Google API Configuration Error\n\n` +
+                            `Domain not authorized: pesona-rasa.netlify.app\n\n` +
+                            `To fix this:\n` +
+                            `1. Go to Google Cloud Console\n` +
+                            `2. Select your project\n` +
+                            `3. Go to APIs & Services > Credentials\n` +
+                            `4. Edit OAuth 2.0 Client ID\n` +
+                            `5. Add to Authorized JavaScript origins:\n` +
+                            `   https://pesona-rasa.netlify.app\n\n` +
+                            `For now, using demo mode...`;
+
+                        alert(helpMsg);
+
+                        // Fallback to demo mode
+                        showDemoAuth();
+                        return;
+                    }
                 }
 
                 const authInstance = window.gapi.auth2.getAuthInstance();
@@ -295,7 +326,44 @@
                 }
             } catch (error) {
                 console.error('Google Auth Error:', error);
-                alert('❌ Authentication failed. Please try again.\n\nError: ' + error.message);
+
+                // Show specific error help
+                let errorMsg = '❌ Authentication failed.\n\n';
+
+                if (error.error === 'popup_blocked_by_browser') {
+                    errorMsg += 'Popup blocked by browser.\nPlease allow popups for this site.';
+                } else if (error.error === 'access_denied') {
+                    errorMsg += 'Access denied by user.\nPlease try again and allow access.';
+                } else if (error.error === 'immediate_failed') {
+                    errorMsg += 'Domain not authorized.\nPlease add pesona-rasa.netlify.app to Google Console.';
+                } else {
+                    errorMsg += `Error: ${error.error || error.message || 'Unknown error'}`;
+                }
+
+                alert(errorMsg);
+
+                // Fallback to demo mode
+                showDemoAuth();
+            }
+        }
+
+        // Demo authentication fallback
+        function showDemoAuth() {
+            const name = prompt('Demo Mode - Enter your name:', 'Customer');
+            const email = prompt('Demo Mode - Enter your email:', 'customer@example.com');
+
+            if (name && email) {
+                currentUser = {
+                    id: 'demo_' + Date.now(),
+                    name: name,
+                    email: email,
+                    imageUrl: 'https://via.placeholder.com/80/2196F3/white?text=' + name.charAt(0)
+                };
+
+                updateAuthButton();
+                showWelcomeMessage();
+
+                alert('✅ Demo login successful!\n\nNote: This is demo mode.\nFor real Google login, configure domain in Google Console.');
             }
         }
 
