@@ -1,8 +1,0 @@
-# Simple Netlify configuration for pre-built static files
-[build]
-  publish = "."
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
