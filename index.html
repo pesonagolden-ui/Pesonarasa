@@ -222,6 +222,10 @@
         // Google API Configuration
         const GOOGLE_CLIENT_ID = '733822404446-m293n75ai4bo96c1lp1fb26vev3ktd43.apps.googleusercontent.com';
         const GOOGLE_API_KEY = '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';
+        const DISCOVERY_DOCS = [
+            'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'
+        ];
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
         let cart = [], total = 0;
         let isGoogleLoaded = false;
@@ -230,7 +234,7 @@
         // Load Google API
         function loadGoogleAPI() {
             return new Promise((resolve, reject) => {
-                if (window.gapi) {
+                if (window.gapi && isGoogleLoaded) {
                     resolve();
                     return;
                 }
@@ -238,21 +242,24 @@
                 const script = document.createElement('script');
                 script.src = 'https://apis.google.com/js/api.js';
                 script.onload = () => {
-                    window.gapi.load('auth2', () => {
-                        window.gapi.auth2.init({
-                            client_id: GOOGLE_CLIENT_ID,
-                            scope: 'profile email',
-                            hosted_domain: null,
-                            fetch_basic_profile: true,
-                            ux_mode: 'popup'
-                        }).then(() => {
+                    window.gapi.load('client:auth2', async () => {
+                        try {
+                            // Initialize the API client
+                            await window.gapi.client.init({
+                                apiKey: GOOGLE_API_KEY,
+                                clientId: GOOGLE_CLIENT_ID,
+                                discoveryDocs: DISCOVERY_DOCS,
+                                scope: SCOPES
+                            });
+
                             isGoogleLoaded = true;
                             console.log('✅ Google API loaded successfully');
+                            console.log('✅ Google Drive API ready');
                             resolve();
-                        }).catch((error) => {
+                        } catch (error) {
                             console.error('Google API init error:', error);
                             reject(error);
-                        });
+                        }
                     });
                 };
                 script.onerror = (error) => {
@@ -311,18 +318,23 @@
                     }
                 } else {
                     // User not logged in, show login
-                    const user = await authInstance.signIn();
+                    const user = await authInstance.signIn({
+                        scope: SCOPES
+                    });
                     const profile = user.getBasicProfile();
 
                     currentUser = {
                         id: profile.getId(),
                         name: profile.getName(),
                         email: profile.getEmail(),
-                        imageUrl: profile.getImageUrl()
+                        imageUrl: profile.getImageUrl(),
+                        accessToken: user.getAuthResponse().access_token
                     };
 
                     updateAuthButton();
                     showWelcomeMessage();
+
+                    console.log('✅ User signed in with Drive access');
                 }
             } catch (error) {
                 console.error('Google Auth Error:', error);
@@ -405,9 +417,176 @@
             }, 5000);
         }
         
-        function showImageDemo() {
-            alert('📷 Image Upload Demo\n\n✅ Drag & Drop\n✅ Auto Compression\n✅ Google Drive Storage\n✅ Progress Tracking\n\nStarting demo...');
-            setTimeout(() => alert('✅ Upload Complete!\n\nFiles: 3 images\nSize: 2.1MB → 850KB\nTime: 1.8 seconds'), 1500);
+        async function showImageDemo() {
+            if (!currentUser) {
+                const loginFirst = confirm('🔐 Please login first to upload images to Google Drive.\n\nClick OK to login');
+                if (loginFirst) {
+                    await showAuth();
+                }
+                return;
+            }
+
+            // Create file input for real upload
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.multiple = true;
+            fileInput.style.display = 'none';
+
+            fileInput.onchange = async (event) => {
+                const files = event.target.files;
+                if (files.length === 0) return;
+
+                await uploadToGoogleDrive(files);
+            };
+
+            document.body.appendChild(fileInput);
+            fileInput.click();
+            document.body.removeChild(fileInput);
+        }
+
+        // Upload files to Google Drive
+        async function uploadToGoogleDrive(files) {
+            if (!isGoogleLoaded) {
+                alert('❌ Google API not loaded. Please try again.');
+                return;
+            }
+
+            // Create upload modal
+            const uploadModal = document.createElement('div');
+            uploadModal.innerHTML = `
+                <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.3);z-index:1000;max-width:400px;width:90%;">
+                    <h3 style="color:#2196F3;margin-bottom:20px;text-align:center;">📷 Uploading to Google Drive</h3>
+                    <div id="uploadProgress">
+                        <div style="background:#f0f0f0;border-radius:10px;padding:15px;margin-bottom:15px;">
+                            <p><strong>Customer:</strong> ${currentUser.name}</p>
+                            <p><strong>Files:</strong> ${files.length} image(s)</p>
+                            <p><strong>Destination:</strong> Google Drive</p>
+                        </div>
+                        <div id="progressBars"></div>
+                        <div style="text-align:center;margin-top:15px;">
+                            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#f44336;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(uploadModal);
+
+            const progressContainer = uploadModal.querySelector('#progressBars');
+            const results = [];
+
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+
+                    // Create progress bar for this file
+                    const progressDiv = document.createElement('div');
+                    progressDiv.innerHTML = `
+                        <div style="margin-bottom:10px;">
+                            <p style="font-size:12px;margin-bottom:5px;">${file.name}</p>
+                            <div style="background:#e0e0e0;border-radius:10px;height:6px;overflow:hidden;">
+                                <div id="progress_${i}" style="background:#4CAF50;height:100%;width:0%;transition:width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                    `;
+                    progressContainer.appendChild(progressDiv);
+
+                    // Upload file
+                    const result = await uploadSingleFile(file, i);
+                    results.push(result);
+                }
+
+                // Show success
+                uploadModal.querySelector('#uploadProgress').innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:60px;color:#4CAF50;margin-bottom:15px;">✅</div>
+                        <h4 style="color:#4CAF50;margin-bottom:15px;">Upload Complete!</h4>
+                        <div style="background:#f0f0f0;border-radius:10px;padding:15px;margin-bottom:15px;text-align:left;">
+                            <p><strong>Uploaded:</strong> ${results.filter(r => r.success).length}/${files.length} files</p>
+                            <p><strong>Location:</strong> Google Drive</p>
+                            <p><strong>Access:</strong> Private to ${currentUser.name}</p>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#2196F3;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;">
+                            Done
+                        </button>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                uploadModal.querySelector('#uploadProgress').innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:60px;color:#f44336;margin-bottom:15px;">❌</div>
+                        <h4 style="color:#f44336;margin-bottom:15px;">Upload Failed</h4>
+                        <p style="margin-bottom:15px;">${error.message}</p>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#f44336;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;">
+                            Close
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Upload single file to Google Drive
+        async function uploadSingleFile(file, index) {
+            return new Promise((resolve) => {
+                const progressBar = document.getElementById(`progress_${index}`);
+
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 20 + 5;
+                    if (progress > 90) progress = 90;
+                    progressBar.style.width = progress + '%';
+                }, 200);
+
+                // Create file metadata
+                const metadata = {
+                    name: `frozen-food-${Date.now()}-${file.name}`,
+                    parents: ['root'] // Upload to root folder
+                };
+
+                const form = new FormData();
+                form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+                form.append('file', file);
+
+                fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token}`
+                    },
+                    body: form
+                })
+                .then(response => response.json())
+                .then(result => {
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+
+                    if (result.id) {
+                        console.log('✅ File uploaded:', result.name);
+                        resolve({
+                            success: true,
+                            fileId: result.id,
+                            fileName: result.name
+                        });
+                    } else {
+                        throw new Error(result.error?.message || 'Upload failed');
+                    }
+                })
+                .catch(error => {
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    progressBar.style.background = '#f44336';
+
+                    console.error('❌ Upload failed:', error);
+                    resolve({
+                        success: false,
+                        error: error.message
+                    });
+                });
+            });
         }
         
         function showQRISDemo(paymentAmount = null, customer = null) {
@@ -665,15 +844,21 @@
                     const user = authInstance.currentUser.get();
                     const profile = user.getBasicProfile();
 
+                    // Check if user has granted Drive access
+                    const hasGrantedScopes = user.hasGrantedScopes(SCOPES);
+
                     currentUser = {
                         id: profile.getId(),
                         name: profile.getName(),
                         email: profile.getEmail(),
-                        imageUrl: profile.getImageUrl()
+                        imageUrl: profile.getImageUrl(),
+                        accessToken: user.getAuthResponse().access_token,
+                        hasDriveAccess: hasGrantedScopes
                     };
 
                     updateAuthButton();
                     console.log('✅ User already signed in:', currentUser.name);
+                    console.log('✅ Drive access:', hasGrantedScopes ? 'Granted' : 'Not granted');
                 }
             } catch (error) {
                 console.warn('⚠️ Google API initialization failed:', error.message);

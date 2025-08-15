@@ -1,7 +1,13 @@
 # 🔧 Google Console Setup untuk pesona-rasa.netlify.app
 
 ## ❌ MASALAH SAAT INI:
-Domain `pesona-rasa.netlify.app` belum ditambahkan ke Google Console, sehingga authentication gagal.
+1. Domain `pesona-rasa.netlify.app` belum ditambahkan ke Google Console
+2. Google Drive API belum diaktifkan
+3. Scope permissions belum dikonfigurasi dengan benar
+
+## 🎯 TARGET API KEYS:
+- **API Key**: `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`
+- **Client ID**: `733822404446-m293n75ai4bo96c1lp1fb26vev3ktd43.apps.googleusercontent.com`
 
 ## ✅ SOLUSI LANGKAH DEMI LANGKAH:
 
@@ -9,6 +15,14 @@ Domain `pesona-rasa.netlify.app` belum ditambahkan ke Google Console, sehingga a
 1. Pergi ke: https://console.cloud.google.com/
 2. Login dengan akun Google yang sama dengan API keys
 3. Pilih project yang berisi Client ID: `733822404446-m293n75ai4bo96c1lp1fb26vev3ktd43`
+
+### **STEP 1.5: Aktifkan Google Drive API**
+1. Di sidebar kiri, klik **"APIs & Services"**
+2. Klik **"Library"**
+3. Search **"Google Drive API"**
+4. Klik **"Google Drive API"**
+5. Klik **"Enable"** jika belum aktif
+6. Ulangi untuk **"Google+ API"** (untuk profile info)
 
 ### **STEP 2: Navigate ke Credentials**
 1. Di sidebar kiri, klik **"APIs & Services"**
